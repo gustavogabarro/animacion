@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciudadano.news — Logo Animation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .scene {
+    position: relative;
+    width: 1080px;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── FULL LOGO ── */
+  .logo-full {
+    position: absolute;
+    display: flex;
+    align-items: flex-end;   /* baseline-align via bottom edge */
+    gap: 3px;
+    white-space: nowrap;
+  }
+
+  /* Each letter wrapper */
+  .glyph {
+    display: inline-flex;
+    align-items: flex-end;
+    flex-shrink: 0;
+    opacity: 0.15;
+    transition: opacity 0.07s ease, filter 0.07s ease, transform 0.07s ease;
+    transform-origin: bottom center;
+  }
+  .glyph img {
+    display: block;
+    /* width/height set inline per letter */
+  }
+  .glyph.lit {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  .glyph.settled {
+    transform: scale(1);
+  }
+
+  /* Dot — special: always orange, pulses */
+  .glyph-dot {
+    display: inline-flex;
+    align-items: flex-end;
+    padding-bottom: 2px;   /* sit right at baseline */
+    opacity: 1;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 0px #ffbf3c);
+    transition: filter 0.15s ease, transform 0.15s ease;
+    transform-origin: bottom center;
+  }
+  .glyph-dot img { display: block; }
+  .glyph-dot.pulse {
+    filter: drop-shadow(0 0 10px #ffbf3c) drop-shadow(0 0 22px rgba(255,191,60,0.6));
+    transform: scale(1.5);
+  }
+  .glyph-dot.settled {
+    transform: scale(1);
+    filter: drop-shadow(0 0 4px rgba(255,191,60,0.5));
+  }
+
+  /* white glyph glow on lit */
+  .glyph.white.lit {
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
+  }
+  /* yellow glyph glow on lit */
+  .glyph.yellow.lit {
+    filter: drop-shadow(0 0 8px rgba(255,191,60,0.4));
+  }
+
+  /* Fade out full logo */
+  .logo-full.fade-out {
+    animation: fadeOutFull 0.28s ease-in forwards;
+  }
+  @keyframes fadeOutFull {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.9); }
+  }
+
+  /* ── COMPACT LOGO ── */
+  .logo-compact {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .logo-compact.pop-in {
+    animation: popIn 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    pointer-events: auto;
+  }
+  .logo-compact img {
+    width: 1020px;
+    height: auto;
+  }
+  @keyframes popIn {
+    0%   { opacity: 0; transform: scale(0.55) translateY(8px); }
+    65%  { opacity: 1; transform: scale(1.08) translateY(-2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Glow ring */
+  .glow-ring {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,191,60,0.07) 0%, transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .glow-ring.active {
+    animation: glowPulse 2.8s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.4); }
+  }
+
+  /* Replay */
+  .replay {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.35);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 7px 22px;
+    cursor: pointer;
+    border-radius: 2px;
+    font-family: Arial, sans-serif;
+    transition: border-color 0.25s, color 0.25s, opacity 0.4s;
+    opacity: 0;
+  }
+  .replay:hover { border-color: #ffbf3c; color: #ffbf3c; }
+</style>
+</head>
+<body>
+
+<div class="scene" id="scene">
+
+  <!-- FULL LOGO — letters as SVG images aligned to baseline -->
+  <div class="logo-full" id="logoFull">
+
+    <!-- Ciudadano (white, left side) -->
+    <span class="glyph white" id="l0"><img src="1c.svg"       width="35"  height="54" alt="C"></span>
+    <span class="glyph white" id="l1"><img src="2i.svg"       width="15"  height="54" alt="i"></span>
+    <span class="glyph white" id="l2"><img src="3u_white.svg" width="34"  height="39" alt="u"></span>
+    <span class="glyph white" id="l3"><img src="4d.svg"       width="35"  height="54" alt="d"></span>
+    <span class="glyph white" id="l4"><img src="5a.svg"       width="33"  height="39" alt="a"></span>
+    <span class="glyph white" id="l5"><img src="6d_2.svg"     width="35"  height="54" alt="d"></span>
+    <span class="glyph white" id="l6"><img src="7a_2.svg"     width="33"  height="39" alt="a"></span>
+    <span class="glyph white" id="l7"><img src="8n_white.svg" width="34"  height="39" alt="n"></span>
+    <span class="glyph white" id="l8"><img src="9o_white.svg" width="35"  height="39" alt="o"></span>
+
+    <!-- Dot -->
+    <span class="glyph-dot" id="dot"><img src="10_dot.svg" width="10" height="10" alt="."></span>
+
+    <!-- news (yellow, right side) -->
+    <span class="glyph yellow" id="n0"><img src="11n_yellow.svg" width="41" height="39" alt="n"></span>
+    <span class="glyph yellow" id="n1"><img src="12e_yellow.svg" width="37" height="39" alt="e"></span>
+    <span class="glyph yellow" id="n2"><img src="13w_yellow.svg" width="58" height="39" alt="w"></span>
+    <span class="glyph yellow" id="n3"><img src="14s_yellow.svg" width="33" height="39" alt="s"></span>
+
+  </div>
+
+  <!-- COMPACT LOGO -->
+  <div class="logo-compact" id="logoCompact">
+    <img src="15cnews.svg" alt="Ciudadano.news">
+  </div>
+
+  <div class="glow-ring" id="glowRing"></div>
+</div>
+
+<button class="replay" id="replayBtn" onclick="restart()">↺ Replay</button>
+
+<script>
+  const STEP         = 40;
+  const FIRST_LETTER = 80;
+  const leftLetters  = ['l8','l7','l6','l5','l4','l3','l2','l1','l0']; // o → C
+  const rightLetters = ['n0','n1','n2','n3'];                            // n → s
+
+  // ══════════════════════════════════════════════════════════
+  //  AUDIO ENGINE — Sophisticated millennial sound design
+  //  Architecture: reverb convolution + stereo field +
+  //  pentatonic scale + layered harmonic tones + bell transient
+  // ══════════════════════════════════════════════════════════
+  let audioCtx = null;
+  let reverbNode = null;
+  let masterGain = null;
+
+  function getCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  // ── Convolution reverb (synthetic impulse response) ──
+  function buildReverb(ctx) {
+    const len    = ctx.sampleRate * 1.8;
+    const ir     = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const ch = ir.getChannelData(c);
+      for (let i = 0; i < len; i++) {
+        // Exponential decay with early reflections
+        const decay = Math.pow(1 - i / len, 2.2);
+        ch[i] = (Math.random() * 2 - 1) * decay * (i < 400 ? 0.4 : 1);
+      }
+    }
+    const conv = ctx.createConvolver();
+    conv.buffer = ir;
+    return conv;
+  }
+
+  // ── Master chain: compressor → gain → destination ──
+  function getMaster(ctx) {
+    if (masterGain) return masterGain;
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -14;
+    comp.knee.value      = 8;
+    comp.ratio.value     = 3;
+    comp.attack.value    = 0.003;
+    comp.release.value   = 0.18;
+
+    reverbNode = buildReverb(ctx);
+    const reverbGain = ctx.createGain();
+    reverbGain.gain.value = 0.22; // wet mix
+
+    masterGain = ctx.createGain();
+    masterGain.gain.value = 0.82;
+
+    // Dry chain
+    comp.connect(masterGain);
+    masterGain.connect(ctx.destination);
+
+    // Wet reverb chain
+    comp.connect(reverbNode);
+    reverbNode.connect(reverbGain);
+    reverbGain.connect(ctx.destination);
+
+    return comp; // return input node
+  }
+
+  // ── Utility: create a bell-like tone with harmonics ──
+  // Uses additive synthesis: fundamental + 2nd + 3rd partial
+  function bell(ctx, master, freq, vol, attack, decay, pan = 0) {
+    const now    = ctx.currentTime;
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = pan;
+    panner.connect(master);
+
+    [[1, 1.0], [2.756, 0.35], [5.404, 0.15]].forEach(([ratio, rel]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq * ratio;
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(vol * rel, now + attack);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + attack + decay);
+      o.connect(g); g.connect(panner);
+      o.start(now); o.stop(now + attack + decay + 0.05);
+    });
+  }
+
+  // ── D major pentatonic scale (warm, modern, positive) ──
+  // D4=293.66, E4=329.63, F#4=369.99, A4=440, B4=493.88
+  // D5=587.33, E5=659.25, F#5=739.99, A5=880
+  const SCALE = [293.66, 329.63, 369.99, 440, 493.88, 587.33, 659.25, 739.99, 880];
+
+  // ── DOT SPARK — the ignition moment ──
+  // A crisp, airy high chime with fast attack + subtle sub pulse
+  function playDotSpark() {
+    const ctx = getCtx(), m = getMaster(ctx), now = ctx.currentTime;
+
+    // Airy chime — high sine with quick shimmer
+    const chime = ctx.createOscillator();
+    const chimeG = ctx.createGain();
+    const chimeF = ctx.createBiquadFilter();
+    chimeF.type = 'highpass'; chimeF.frequency.value = 2000;
+    chime.type = 'sine';
+    chime.frequency.setValueAtTime(2093, now);        // C7
+    chime.frequency.exponentialRampToValueAtTime(3136, now + 0.05); // G7
+    chimeG.gain.setValueAtTime(0, now);
+    chimeG.gain.linearRampToValueAtTime(0.28, now + 0.008);
+    chimeG.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+    chime.connect(chimeF); chimeF.connect(chimeG); chimeG.connect(m);
+    chime.start(now); chime.stop(now + 0.25);
+
+    // Warm sub click — grounding the spark
+    const sub = ctx.createOscillator();
+    const subG = ctx.createGain();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(180, now);
+    sub.frequency.exponentialRampToValueAtTime(60, now + 0.08);
+    subG.gain.setValueAtTime(0.32, now);
+    subG.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+    sub.connect(subG); subG.connect(m);
+    sub.start(now); sub.stop(now + 0.12);
+
+    // Stereo shimmer — tiny noise burst panned wide
+    const buf = ctx.createBuffer(2, ctx.sampleRate * 0.06, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const ch = buf.getChannelData(c);
+      for (let i = 0; i < ch.length; i++) {
+        ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / ch.length, 3);
+      }
+    }
+    const noise = ctx.createBufferSource();
+    const noiseG = ctx.createGain();
+    const noiseF = ctx.createBiquadFilter();
+    noiseF.type = 'bandpass'; noiseF.frequency.value = 6000; noiseF.Q.value = 0.8;
+    noise.buffer = buf;
+    noiseG.gain.setValueAtTime(0.08, now);
+    noiseG.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+    noise.connect(noiseF); noiseF.connect(noiseG); noiseG.connect(m);
+    noise.start(now);
+  }
+
+  // ── LETTER TICKS — ascending pentatonic bells ──
+  // Each step = next note in the scale, panned from center outward
+  function playLetterTick(stepIndex, totalSteps) {
+    const ctx    = getCtx();
+    const m      = getMaster(ctx);
+    const note   = SCALE[Math.min(stepIndex, SCALE.length - 1)];
+    // Pan: left letters pan left, right letters pan right
+    // stepIndex 0 = nearest dot (center), increases outward
+    const panAmt = (stepIndex / (totalSteps - 1)) * 0.5;
+
+    // Bell tone — clean, glassy
+    bell(ctx, m, note, 0.13, 0.006, 0.28, 0);
+
+    // Add a soft octave above for brightness on later steps
+    if (stepIndex > 3) {
+      bell(ctx, m, note * 2, 0.045, 0.008, 0.18, 0);
+    }
+  }
+
+  // ── FINAL NOTIFICATION — logo lock ──
+  // Three-note ascending chord (D major: D5-F#5-A5) + warm sub thud
+  // Inspired by premium app notification sounds (Slack, Apple, Linear)
+  function playFinalImpact() {
+    const ctx = getCtx(), m = getMaster(ctx), now = ctx.currentTime;
+
+    // ① Warm sub thud — physical, grounding
+    const sub = ctx.createOscillator();
+    const subG = ctx.createGain();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(98, now);   // G2
+    sub.frequency.exponentialRampToValueAtTime(55, now + 0.22);
+    subG.gain.setValueAtTime(0, now);
+    subG.gain.linearRampToValueAtTime(0.5, now + 0.01);
+    subG.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+    sub.connect(subG); subG.connect(m);
+    sub.start(now); sub.stop(now + 0.32);
+
+    // ② Three-note ascending arpeggio — D5, F#5, A5
+    // Staggered 35ms apart for a flowing, confident feel
+    [
+      { freq: 587.33, delay: 0,     pan: -0.3, vol: 0.22, dec: 0.9  }, // D5
+      { freq: 739.99, delay: 0.035, pan:  0,   vol: 0.20, dec: 0.85 }, // F#5
+      { freq: 880,    delay: 0.07,  pan:  0.3, vol: 0.18, dec: 1.1  }, // A5
+    ].forEach(({ freq, delay, pan, vol, dec }) => {
+      const t = now + delay;
+      const panner = ctx.createStereoPanner();
+      panner.pan.value = pan;
+      panner.connect(m);
+
+      // Main bell partial
+      [[1, 1], [2.756, 0.28], [5.404, 0.1]].forEach(([ratio, rel]) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = freq * ratio;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(vol * rel, t + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dec);
+        o.connect(g); g.connect(panner);
+        o.start(t); o.stop(t + dec + 0.05);
+      });
+    });
+
+    // ③ Soft shimmer tail — high sine that fades like a gong ring
+    const tail = ctx.createOscillator();
+    const tailG = ctx.createGain();
+    tail.type = 'sine';
+    tail.frequency.value = 1760; // A6 — an octave above A5
+    tailG.gain.setValueAtTime(0, now + 0.07);
+    tailG.gain.linearRampToValueAtTime(0.09, now + 0.12);
+    tailG.gain.exponentialRampToValueAtTime(0.0001, now + 1.4);
+    tail.connect(tailG); tailG.connect(m);
+    tail.start(now + 0.07); tail.stop(now + 1.45);
+
+    // ④ Air release — subtle noise whoosh that seals the sound
+    const airBuf = ctx.createBuffer(2, ctx.sampleRate * 0.15, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const ch = airBuf.getChannelData(c);
+      for (let i = 0; i < ch.length; i++) {
+        ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / ch.length, 1.5) * (c === 0 ? 1 : -1);
+      }
+    }
+    const air = ctx.createBufferSource();
+    const airG = ctx.createGain();
+    const airF = ctx.createBiquadFilter();
+    airF.type = 'highpass'; airF.frequency.value = 4000;
+    air.buffer = airBuf;
+    airG.gain.setValueAtTime(0.06, now + 0.06);
+    airG.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+    air.connect(airF); airF.connect(airG); airG.connect(m);
+    air.start(now + 0.06);
+  }
+  // ══════════════════════════════════════════════════════════
+
+  function litUp(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('lit');
+    setTimeout(() => el.classList.add('settled'), 110);
+  }
+
+  function runSequence() {
+    const maxSteps = Math.max(leftLetters.length, rightLetters.length);
+    const allLit   = FIRST_LETTER + (maxSteps - 1) * STEP + 160;
+
+    // 1. Dot spark
+    playDotSpark();
+    const dot = document.getElementById('dot');
+    if (dot) { dot.classList.add('pulse'); setTimeout(() => dot.classList.add('settled'), 220); }
+
+    // 2. Letters expand bidirectionally with ascending ticks
+    for (let i = 0; i < maxSteps; i++) {
+      const t = FIRST_LETTER + i * STEP;
+      setTimeout(() => {
+        playLetterTick(i, maxSteps);
+        if (i < leftLetters.length)  litUp(leftLetters[i]);
+        if (i < rightLetters.length) litUp(rightLetters[i]);
+      }, t);
+    }
+
+    // 3. Fade out full logo
+    setTimeout(() => {
+      const full = document.getElementById('logoFull');
+      if (full) full.classList.add('fade-out');
+    }, allLit);
+
+    // 4. Pop in compact + impact sound
+    setTimeout(() => {
+      playFinalImpact();
+      const compact = document.getElementById('logoCompact');
+      const glow    = document.getElementById('glowRing');
+      if (compact) compact.classList.add('pop-in');
+      if (glow)    glow.classList.add('active');
+      setTimeout(() => {
+        const btn = document.getElementById('replayBtn');
+        if (btn) btn.style.opacity = '1';
+      }, 600);
+    }, allLit + 260);
+  }
+
+  function restart() {
+    document.getElementById('replayBtn').style.opacity = '0';
+    const scene = document.getElementById('scene');
+    scene.innerHTML = `
+      <div class="logo-full" id="logoFull">
+        <span class="glyph white" id="l0"><img src="1c.svg"       width="35"  height="54" alt="C"></span>
+        <span class="glyph white" id="l1"><img src="2i.svg"       width="15"  height="54" alt="i"></span>
+        <span class="glyph white" id="l2"><img src="3u_white.svg" width="34"  height="39" alt="u"></span>
+        <span class="glyph white" id="l3"><img src="4d.svg"       width="35"  height="54" alt="d"></span>
+        <span class="glyph white" id="l4"><img src="5a.svg"       width="33"  height="39" alt="a"></span>
+        <span class="glyph white" id="l5"><img src="6d_2.svg"     width="35"  height="54" alt="d"></span>
+        <span class="glyph white" id="l6"><img src="7a_2.svg"     width="33"  height="39" alt="a"></span>
+        <span class="glyph white" id="l7"><img src="8n_white.svg" width="34"  height="39" alt="n"></span>
+        <span class="glyph white" id="l8"><img src="9o_white.svg" width="35"  height="39" alt="o"></span>
+        <span class="glyph-dot" id="dot"><img src="10_dot.svg" width="10" height="10" alt="."></span>
+        <span class="glyph yellow" id="n0"><img src="11n_yellow.svg" width="41" height="39" alt="n"></span>
+        <span class="glyph yellow" id="n1"><img src="12e_yellow.svg" width="37" height="39" alt="e"></span>
+        <span class="glyph yellow" id="n2"><img src="13w_yellow.svg" width="58" height="39" alt="w"></span>
+        <span class="glyph yellow" id="n3" style="margin-left:-6px;"><img src="14s_yellow.svg" width="33" height="39" alt="s"></span>
+      </div>
+      <div class="logo-compact" id="logoCompact">
+        <img src="15cnews.svg" alt="Ciudadano.news">
+      </div>
+      <div class="glow-ring" id="glowRing"></div>
+    `;
+    void scene.offsetWidth;
+    runSequence();
+  }
+
+  runSequence();
+</script>
+</body>
+</html>

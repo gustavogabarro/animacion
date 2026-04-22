@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciudadano.news - Review Final</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --accent: #ffbf3c;
+            --card-bg: #141414;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { font-size: 1.2rem; color: var(--accent); letter-spacing: 3px; margin-bottom: 40px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #222;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 15px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* Contenedores con escala real */
+        .stage {
+            background: #000;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Proporciones reducidas un 60% */
+        .h-16-9 { width: 432px; height: 243px; }
+        .v-9-16 { width: 225px; height: 400px; }
+
+        iframe {
+            width: 1080px; /* Tamaño original de la animación */
+            height: 400px; /* Tamaño original de la animación */
+            border: none;
+            transform: scale(0.4); /* Escala 0.4 = 60% menos */
+            transform-origin: center center;
+            position: absolute;
+            pointer-events: none; /* Evita interactuar con elementos internos */
+        }
+
+        /* Ajuste para que el logo largo entre en el vertical */
+        .v-9-16 iframe {
+            transform: scale(0.22); 
+        }
+
+        /* Botón de Replay Externo */
+        .btn-replay {
+            margin-top: 20px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-replay:hover {
+            background: var(--accent);
+            color: black;
+            box-shadow: 0 0 15px rgba(255, 191, 60, 0.4);
+        }
+
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>CIUDADANO.NEWS ASSET PREVIEW</h1>
+
+    <div class="grid">
+        <div class="card">
+            <span class="tag">HORIZONTAL 16:9 - NEW SOUND</span>
+            <div class="stage h-16-9">
+                <iframe id="frame1" src="ciudadano-news-animation new sound.html"></iframe>
+            </div>
+            <button class="btn-replay" onclick="reset('frame1')">Reiniciar Animación</button>
+        </div>
+
+        <div class="card">
+            <span class="tag">HORIZONTAL 16:9 - STANDARD SVG</span>
+            <div class="stage h-16-9">
+                <iframe id="frame2" src="ciudadano-news-animation SVG.html"></iframe>
+            </div>
+            <button class="btn-replay" onclick="reset('frame2')">Reiniciar Animación</button>
+        </div>
+
+        <div class="card">
+            <span class="tag">VERTICAL 9:16 - NEW SOUND</span>
+            <div class="stage v-9-16">
+                <iframe id="frame3" src="ciudadano-news-animation new sound.html"></iframe>
+            </div>
+            <button class="btn-replay" onclick="reset('frame3')">Reiniciar Animación</button>
+        </div>
+
+        <div class="card">
+            <span class="tag">VERTICAL 9:16 - STANDARD SVG</span>
+            <div class="stage v-9-16">
+                <iframe id="frame4" src="ciudadano-news-animation SVG.html"></iframe>
+            </div>
+            <button class="btn-replay" onclick="reset('frame4')">Reiniciar Animación</button>
+        </div>
+    </div>
+
+    <script>
+        function reset(id) {
+            const f = document.getElementById(id);
+            f.src = f.src;
+        }
+
+        // Inyección de CSS para ELIMINAR botones internos y CENTRAR
+        window.onload = () => {
+            document.querySelectorAll('iframe').forEach(frame => {
+                frame.onload = () => {
+                    const doc = frame.contentDocument;
+                    const style = doc.createElement('style');
+                    style.innerHTML = `
+                        /* Ocultamos el botón de replay interno */
+                        .replay, #replay, button { display: none !important; }
+                        
+                        /* Forzamos el centrado de la animación */
+                        body { 
+                            margin: 0 !important; 
+                            background: black !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            height: 100vh !important;
+                            overflow: hidden !important;
+                        }
+                    `;
+                    doc.head.appendChild(style);
+                };
+            });
+        };
+    </script>
+</body>
+</html>
