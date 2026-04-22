@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciudadano.news — Maqueta Cierre</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+
+  /* ── 16:9 PLAYER WRAPPER ── */
+  .player-wrap {
+    position: relative;
+    width: min(90vw, 960px);
+    aspect-ratio: 16 / 9;
+    background: #000;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(0,0,0,0.8);
+  }
+
+  /* ── VIDEO LAYER ── */
+  .main-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 1;
+    transition: opacity 0.6s ease;
+  }
+  .main-video.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ── CIERRE LAYER ── */
+  .cierre {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .cierre.show {
+    opacity: 1;
+  }
+
+  /* Logo scene */
+  .logo-scene {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .logo-full {
+    position: absolute;
+    display: flex;
+    align-items: baseline;
+    white-space: nowrap;
+  }
+
+  .letter {
+    display: inline-block;
+    font-family: 'Raleway', 'Arial Black', Arial, sans-serif;
+    font-size: clamp(28px, 5.5vw, 56px);
+    font-weight: 900;
+    color: #2a2a2a;
+    transition: color 0.08s ease, text-shadow 0.08s ease, transform 0.08s ease;
+  }
+  .letter.lit {
+    color: #ffffff;
+    text-shadow: 0 0 18px rgba(255,255,255,0.25);
+    transform: scale(1.05);
+  }
+  .letter.settled { transform: scale(1); }
+
+  .dot-char {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(10px, 1.8vw, 18px);
+    height: clamp(28px, 5.5vw, 56px);
+    vertical-align: bottom;
+    margin: 0 2px;
+    filter: drop-shadow(0 0 0px #F5A623);
+    transition: filter 0.15s ease, transform 0.15s ease;
+  }
+  .dot-circle {
+    display: block;
+    width: clamp(6px, 1vw, 10px);
+    height: clamp(6px, 1vw, 10px);
+    border-radius: 50%;
+    background: #F5A623;
+    margin-bottom: clamp(3px, 0.5vw, 6px);
+  }
+  .dot-char.pulse {
+    filter: drop-shadow(0 0 14px #F5A623) drop-shadow(0 0 28px rgba(245,166,35,0.5));
+    transform: scale(1.35);
+  }
+  .dot-char.settled {
+    transform: scale(1);
+    filter: drop-shadow(0 0 4px rgba(245,166,35,0.4));
+  }
+
+  .news-letter {
+    display: inline-block;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(28px, 5.5vw, 56px);
+    font-weight: 400;
+    font-style: italic;
+    color: #3d2800;
+    transition: color 0.08s ease, text-shadow 0.08s ease, transform 0.08s ease;
+  }
+  .news-letter.lit {
+    color: #F5A623;
+    text-shadow: 0 0 14px rgba(245,166,35,0.45);
+    transform: scale(1.05);
+  }
+  .news-letter.settled { transform: scale(1); }
+
+  .logo-full.fade-out {
+    animation: fadeOutFull 0.28s ease-in forwards;
+  }
+  @keyframes fadeOutFull {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.9); }
+  }
+
+  /* Compact logo */
+  .logo-compact {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .logo-compact.pop-in {
+    animation: popIn 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  .big-c {
+    font-family: 'Raleway', 'Arial Black', Arial, sans-serif;
+    font-size: clamp(60px, 10vw, 96px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.12));
+  }
+  .compact-news {
+    font-family: Georgia, serif;
+    font-size: clamp(14px, 2.2vw, 24px);
+    font-weight: 400;
+    font-style: italic;
+    color: #F5A623;
+    letter-spacing: 1.5px;
+    margin-top: -4px;
+    filter: drop-shadow(0 0 8px rgba(245,166,35,0.35));
+  }
+  @keyframes popIn {
+    0%   { opacity: 0; transform: scale(0.55) translateY(8px); }
+    65%  { opacity: 1; transform: scale(1.08) translateY(-2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .glow-ring {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,166,35,0.07) 0%, transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .glow-ring.active {
+    animation: glowPulse 2.8s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.4); }
+  }
+
+  /* ── PLAY BUTTON OVERLAY (antes de reproducir) ── */
+  .play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: opacity 0.3s;
+    z-index: 10;
+  }
+  .play-overlay.hidden { opacity: 0; pointer-events: none; }
+  .play-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(245,166,35,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .play-btn:hover { transform: scale(1.1); background: #F5A623; }
+  .play-btn svg { width: 28px; height: 28px; fill: #000; margin-left: 4px; }
+
+  /* Label */
+  .label {
+    margin-top: 16px;
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Replay button */
+  .replay {
+    margin-top: 16px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.35);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 7px 22px;
+    cursor: pointer;
+    border-radius: 2px;
+    font-family: Arial, sans-serif;
+    transition: border-color 0.25s, color 0.25s, opacity 0.4s;
+    opacity: 0;
+  }
+  .replay:hover { border-color: #F5A623; color: #F5A623; }
+</style>
+</head>
+<body>
+
+<div class="player-wrap" id="playerWrap">
+
+  <!-- VIDEO -->
+  <video class="main-video" id="mainVideo" playsinline preload="auto">
+    <source src="prueba.mp4" type="video/mp4">
+  </video>
+
+  <!-- PLAY OVERLAY -->
+  <div class="play-overlay" id="playOverlay" onclick="startVideo()">
+    <div class="play-btn">
+      <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+    </div>
+  </div>
+
+  <!-- CIERRE CON LOGO -->
+  <div class="cierre" id="cierre">
+    <div class="logo-scene" id="logoScene">
+      <div class="logo-full" id="logoFull">
+        <span class="letter"      id="l0">C</span><span
+              class="letter"      id="l1">i</span><span
+              class="letter"      id="l2">u</span><span
+              class="letter"      id="l3">d</span><span
+              class="letter"      id="l4">a</span><span
+              class="letter"      id="l5">d</span><span
+              class="letter"      id="l6">a</span><span
+              class="letter"      id="l7">n</span><span
+              class="letter"      id="l8">o</span><span
+              class="dot-char"    id="dot"><span class="dot-circle"></span></span><span
+              class="news-letter" id="n0">n</span><span
+              class="news-letter" id="n1">e</span><span
+              class="news-letter" id="n2">w</span><span
+              class="news-letter" id="n3">s</span>
+      </div>
+      <div class="logo-compact" id="logoCompact">
+        <div class="big-c">C</div>
+        <div class="compact-news">.news</div>
+      </div>
+      <div class="glow-ring" id="glowRing"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="label">Ciudadano.news — Maqueta cierre 16:9</div>
+<button class="replay" id="replayBtn" onclick="replayAll()">↺ Reproducir de nuevo</button>
+
+<script>
+  const STEP         = 40;
+  const FIRST_LETTER = 80;
+  const leftLetters  = ['l8','l7','l6','l5','l4','l3','l2','l1','l0'];
+  const rightLetters = ['n0','n1','n2','n3'];
+
+  // ── AUDIO ENGINE ──────────────────────────────────────────
+  let audioCtx = null;
+
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  // Master compressor to glue everything together
+  function getMaster(ctx) {
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -12;
+    comp.ratio.value = 4;
+    comp.connect(ctx.destination);
+    return comp;
+  }
+
+  // Dot spark: short high sine burst + noise click
+  function playDotSpark() {
+    const ctx    = getAudioCtx();
+    const master = getMaster(ctx);
+    const now    = ctx.currentTime;
+
+    // Sine ping
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1800, now);
+    osc.frequency.exponentialRampToValueAtTime(2800, now + 0.06);
+    gain.gain.setValueAtTime(0.35, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    osc.connect(gain); gain.connect(master);
+    osc.start(now); osc.stop(now + 0.13);
+
+    // Noise click
+    const buf  = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+    const src  = ctx.createBufferSource();
+    const gn   = ctx.createGain();
+    src.buffer = buf;
+    gn.gain.setValueAtTime(0.18, now);
+    gn.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    src.connect(gn); gn.connect(master);
+    src.start(now);
+  }
+
+  // Letter tick: tiny pitched blip, pitch rises with each step
+  function playLetterTick(stepIndex, totalSteps) {
+    const ctx    = getAudioCtx();
+    const master = getMaster(ctx);
+    const now    = ctx.currentTime;
+
+    // Map step 0→totalSteps to frequency 400→1200 Hz (ascending sweep)
+    const t    = stepIndex / (totalSteps - 1);
+    const freq = 400 + t * 800;
+
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.15, now + 0.04);
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+    osc.connect(gain); gain.connect(master);
+    osc.start(now); osc.stop(now + 0.07);
+  }
+
+  // Final impact: low thud + high shimmer chord = "logo locked"
+  function playFinalImpact() {
+    const ctx    = getAudioCtx();
+    const master = getMaster(ctx);
+    const now    = ctx.currentTime;
+
+    // Low sub thud
+    const sub  = ctx.createOscillator();
+    const subG = ctx.createGain();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(80, now);
+    sub.frequency.exponentialRampToValueAtTime(40, now + 0.18);
+    subG.gain.setValueAtTime(0.55, now);
+    subG.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    sub.connect(subG); subG.connect(master);
+    sub.start(now); sub.stop(now + 0.26);
+
+    // Shimmer chord (3 sine tones)
+    [[880, 0.12], [1100, 0.09], [1320, 0.07]].forEach(([freq, vol], i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq, now);
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(vol, now + 0.03 + i * 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      o.connect(g); g.connect(master);
+      o.start(now); o.stop(now + 0.55);
+    });
+
+    // Ascending sweep tone (the "news" feel)
+    const sweep  = ctx.createOscillator();
+    const sweepG = ctx.createGain();
+    sweep.type = 'sawtooth';
+    const sweepFilter = ctx.createBiquadFilter();
+    sweepFilter.type = 'lowpass';
+    sweepFilter.frequency.setValueAtTime(300, now);
+    sweepFilter.frequency.exponentialRampToValueAtTime(2000, now + 0.4);
+    sweep.frequency.setValueAtTime(220, now);
+    sweep.frequency.exponentialRampToValueAtTime(440, now + 0.4);
+    sweepG.gain.setValueAtTime(0.18, now);
+    sweepG.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+    sweep.connect(sweepFilter); sweepFilter.connect(sweepG); sweepG.connect(master);
+    sweep.start(now); sweep.stop(now + 0.46);
+  }
+  // ─────────────────────────────────────────────────────────
+
+  function litUp(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('lit');
+    setTimeout(() => el.classList.add('settled'), 110);
+  }
+
+  function runLogoAnimation() {
+    const maxSteps = Math.max(leftLetters.length, rightLetters.length);
+    const allLit   = FIRST_LETTER + (maxSteps - 1) * STEP + 160;
+
+    // 1. Dot spark — ignition
+    playDotSpark();
+    const dot = document.getElementById('dot');
+    if (dot) {
+      dot.classList.add('pulse');
+      setTimeout(() => dot.classList.add('settled'), 220);
+    }
+
+    // 2. Letters expand + ascending ticks
+    for (let i = 0; i < maxSteps; i++) {
+      const t = FIRST_LETTER + i * STEP;
+      setTimeout(() => {
+        playLetterTick(i, maxSteps);
+        if (i < leftLetters.length)  litUp(leftLetters[i]);
+        if (i < rightLetters.length) litUp(rightLetters[i]);
+      }, t);
+    }
+
+    // 3. Fade out full logo
+    setTimeout(() => {
+      const full = document.getElementById('logoFull');
+      if (full) full.classList.add('fade-out');
+    }, allLit);
+
+    // 4. Final impact + compact logo pop-in
+    setTimeout(() => {
+      playFinalImpact();
+      const compact = document.getElementById('logoCompact');
+      const glow    = document.getElementById('glowRing');
+      if (compact) compact.classList.add('pop-in');
+      if (glow)    glow.classList.add('active');
+
+      setTimeout(() => {
+        const btn = document.getElementById('replayBtn');
+        if (btn) btn.style.opacity = '1';
+      }, 600);
+    }, allLit + 260);
+  }
+
+  function startVideo() {
+    const video   = document.getElementById('mainVideo');
+    const overlay = document.getElementById('playOverlay');
+    overlay.classList.add('hidden');
+    video.play();
+
+    video.addEventListener('ended', onVideoEnd, { once: true });
+  }
+
+  function onVideoEnd() {
+    const video  = document.getElementById('mainVideo');
+    const cierre = document.getElementById('cierre');
+
+    // Fade out video, fade in cierre
+    video.classList.add('hide');
+    cierre.classList.add('show');
+
+    // Start logo animation after cierre is visible
+    setTimeout(runLogoAnimation, 400);
+  }
+
+  function replayAll() {
+    document.getElementById('replayBtn').style.opacity = '0';
+
+    // Reset logo scene
+    const scene = document.getElementById('logoScene');
+    scene.innerHTML = `
+      <div class="logo-full" id="logoFull">
+        <span class="letter"      id="l0">C</span><span
+              class="letter"      id="l1">i</span><span
+              class="letter"      id="l2">u</span><span
+              class="letter"      id="l3">d</span><span
+              class="letter"      id="l4">a</span><span
+              class="letter"      id="l5">d</span><span
+              class="letter"      id="l6">a</span><span
+              class="letter"      id="l7">n</span><span
+              class="letter"      id="l8">o</span><span
+              class="dot-char"    id="dot"><span class="dot-circle"></span></span><span
+              class="news-letter" id="n0">n</span><span
+              class="news-letter" id="n1">e</span><span
+              class="news-letter" id="n2">w</span><span
+              class="news-letter" id="n3">s</span>
+      </div>
+      <div class="logo-compact" id="logoCompact">
+        <div class="big-c">C</div>
+        <div class="compact-news">.news</div>
+      </div>
+      <div class="glow-ring" id="glowRing"></div>
+    `;
+
+    // Reset video and cierre
+    const video   = document.getElementById('mainVideo');
+    const cierre  = document.getElementById('cierre');
+    const overlay = document.getElementById('playOverlay');
+
+    cierre.classList.remove('show');
+    video.classList.remove('hide');
+    video.currentTime = 0;
+    overlay.classList.remove('hidden');
+
+    void scene.offsetWidth;
+  }
+</script>
+</body>
+</html>

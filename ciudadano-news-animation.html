@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciudadano.news — Logo Animation</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .scene {
+    position: relative;
+    width: 700px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── FULL LOGO ── */
+  .logo-full {
+    position: absolute;
+    display: flex;
+    align-items: baseline;
+    white-space: nowrap;
+  }
+
+  /* "Ciudadano" — white letters, start dim */
+  .letter {
+    display: inline-block;
+    font-family: 'Raleway', 'Arial Black', Arial, sans-serif;
+    font-size: 56px;
+    font-weight: 900;
+    color: #2a2a2a;
+    transition: color 0.08s ease, text-shadow 0.08s ease, transform 0.08s ease;
+  }
+  .letter.lit {
+    color: #ffffff;
+    text-shadow: 0 0 18px rgba(255,255,255,0.25);
+    transform: scale(1.05);
+  }
+  .letter.settled {
+    transform: scale(1);
+  }
+
+  /* The dot — always orange */
+  .dot-char {
+    display: inline-block;
+    font-family: 'Raleway', 'Arial Black', Arial, sans-serif;
+    font-size: 56px;
+    font-weight: 900;
+    color: #F5A623;
+    line-height: 1;
+    filter: drop-shadow(0 0 0px #F5A623);
+    transition: filter 0.15s ease, transform 0.15s ease;
+  }
+  .dot-char.pulse {
+    filter: drop-shadow(0 0 14px #F5A623) drop-shadow(0 0 28px rgba(245,166,35,0.5));
+    transform: scale(1.35);
+  }
+  .dot-char.settled {
+    transform: scale(1);
+    filter: drop-shadow(0 0 4px rgba(245,166,35,0.4));
+  }
+
+  /* ".news" — italic golden, start dim */
+  .news-letter {
+    display: inline-block;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 56px;
+    font-weight: 400;
+    font-style: italic;
+    color: #3d2800;
+    transition: color 0.08s ease, text-shadow 0.08s ease, transform 0.08s ease;
+  }
+  .news-letter.lit {
+    color: #F5A623;
+    text-shadow: 0 0 14px rgba(245,166,35,0.45);
+    transform: scale(1.05);
+  }
+  .news-letter.settled {
+    transform: scale(1);
+  }
+
+  /* Fade out the full logo */
+  .logo-full.fade-out {
+    animation: fadeOutFull 0.28s ease-in forwards;
+  }
+  @keyframes fadeOutFull {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.9); }
+  }
+
+  /* ── COMPACT LOGO ── */
+  .logo-compact {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .logo-compact.pop-in {
+    animation: popIn 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    pointer-events: auto;
+  }
+  .big-c {
+    font-family: 'Raleway', 'Arial Black', Arial, sans-serif;
+    font-size: 96px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.12));
+  }
+  .compact-news {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px;
+    font-weight: 400;
+    font-style: italic;
+    color: #F5A623;
+    letter-spacing: 1.5px;
+    margin-top: -4px;
+    filter: drop-shadow(0 0 8px rgba(245,166,35,0.35));
+  }
+
+  @keyframes popIn {
+    0%   { opacity: 0; transform: scale(0.55) translateY(8px); }
+    65%  { opacity: 1; transform: scale(1.08) translateY(-2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Ambient glow ring */
+  .glow-ring {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,166,35,0.07) 0%, transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .glow-ring.active {
+    animation: glowPulse 2.8s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.4); }
+  }
+
+  /* Replay button */
+  .replay {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.35);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 7px 22px;
+    cursor: pointer;
+    border-radius: 2px;
+    font-family: Arial, sans-serif;
+    transition: border-color 0.25s, color 0.25s, opacity 0.4s;
+    opacity: 0;
+  }
+  .replay:hover { border-color: #F5A623; color: #F5A623; }
+</style>
+</head>
+<body>
+
+<div class="scene" id="scene">
+  <div class="logo-full" id="logoFull">
+    <span class="letter"      id="l0">C</span><span
+          class="letter"      id="l1">i</span><span
+          class="letter"      id="l2">u</span><span
+          class="letter"      id="l3">d</span><span
+          class="letter"      id="l4">a</span><span
+          class="letter"      id="l5">d</span><span
+          class="letter"      id="l6">a</span><span
+          class="letter"      id="l7">n</span><span
+          class="letter"      id="l8">o</span><span
+          class="dot-char"    id="dot">.</span><span
+          class="news-letter" id="n0">n</span><span
+          class="news-letter" id="n1">e</span><span
+          class="news-letter" id="n2">w</span><span
+          class="news-letter" id="n3">s</span>
+  </div>
+
+  <div class="logo-compact" id="logoCompact">
+    <div class="big-c">C</div>
+    <div class="compact-news">.news</div>
+  </div>
+
+  <div class="glow-ring" id="glowRing"></div>
+</div>
+
+<button class="replay" id="replayBtn" onclick="restart()">↺ Replay</button>
+
+<script>
+  // DOT fires first as the origin spark.
+  // Then simultaneously:
+  //   LEFT  → white letters expanding toward C:  o, n, a, d, a, d, u, i, C
+  //   RIGHT → gold letters expanding toward s:   n, e, w, s
+
+  const STEP         = 40;   // ms between each step
+  const FIRST_LETTER = 80;  // delay before first letters light (after dot pulse)
+
+  const leftLetters  = ['l8','l7','l6','l5','l4','l3','l2','l1','l0']; // o → C
+  const rightLetters = ['n0','n1','n2','n3'];                            // n → s
+
+  function litUp(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('lit');
+    setTimeout(() => el.classList.add('settled'), 110);
+  }
+
+  function runSequence() {
+    // Step 1: Dot pulse — the ignition point
+    setTimeout(() => {
+      const dot = document.getElementById('dot');
+      if (!dot) return;
+      dot.classList.add('pulse');
+      setTimeout(() => dot.classList.add('settled'), 220);
+    }, 0);
+
+    // Step 2: Letters expand simultaneously from the dot outward
+    const maxSteps = Math.max(leftLetters.length, rightLetters.length);
+    for (let i = 0; i < maxSteps; i++) {
+      const t = FIRST_LETTER + i * STEP;
+      if (i < leftLetters.length)  setTimeout(() => litUp(leftLetters[i]),  t);
+      if (i < rightLetters.length) setTimeout(() => litUp(rightLetters[i]), t);
+    }
+
+    // Step 3: Transition to compact logo
+    const allLit = FIRST_LETTER + (maxSteps - 1) * STEP + 160;
+
+    setTimeout(() => {
+      const full = document.getElementById('logoFull');
+      if (full) full.classList.add('fade-out');
+    }, allLit);
+
+    setTimeout(() => {
+      const compact = document.getElementById('logoCompact');
+      const glow    = document.getElementById('glowRing');
+      if (compact) compact.classList.add('pop-in');
+      if (glow)    glow.classList.add('active');
+    }, allLit + 260);
+
+    // Step 4: Show replay
+    setTimeout(() => {
+      const btn = document.getElementById('replayBtn');
+      if (btn) btn.style.opacity = '1';
+    }, allLit + 720);
+  }
+
+  function restart() {
+    document.getElementById('replayBtn').style.opacity = '0';
+
+    const scene = document.getElementById('scene');
+    scene.innerHTML = `
+      <div class="logo-full" id="logoFull">
+        <span class="letter"      id="l0">C</span><span
+              class="letter"      id="l1">i</span><span
+              class="letter"      id="l2">u</span><span
+              class="letter"      id="l3">d</span><span
+              class="letter"      id="l4">a</span><span
+              class="letter"      id="l5">d</span><span
+              class="letter"      id="l6">a</span><span
+              class="letter"      id="l7">n</span><span
+              class="letter"      id="l8">o</span><span
+              class="dot-char"    id="dot">.</span><span
+              class="news-letter" id="n0">n</span><span
+              class="news-letter" id="n1">e</span><span
+              class="news-letter" id="n2">w</span><span
+              class="news-letter" id="n3">s</span>
+      </div>
+      <div class="logo-compact" id="logoCompact">
+        <div class="big-c">C</div>
+        <div class="compact-news">.news</div>
+      </div>
+      <div class="glow-ring" id="glowRing"></div>
+    `;
+
+    void scene.offsetWidth; // force reflow
+    runSequence();
+  }
+
+  runSequence();
+</script>
+</body>
+</html>
