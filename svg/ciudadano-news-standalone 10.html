@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ciudadano.news - Animación Final</title>
+    <!-- Librería Lottie indispensable para interpretar el JSON de tus fuentes [1] -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.0/lottie.min.js"></script>
+    <style>
+        body { background-color: #222; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        canvas { background-color: transparent; border: 1px solid #444; max-width: 100%; height: auto; display: block; margin: 0 auto; }
+        .controls { margin-top: 20px; }
+        button { padding: 10px 20px; cursor: pointer; margin: 5px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; }
+        #recStatus { display: block; margin-top: 10px; color: #ffa500; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <canvas id="scene" width="1920" height="1080"></canvas>
+
+    <div class="controls">
+        <!-- Interfaz extraída de tus fuentes [9, 10] -->
+        <button class="replay" id="replayBtn" onclick="restart()">↻ Replay</button>
+        <button id="recBtn">Grabar Video (WebM Alfa)</button>
+        <button id="wavBtn">Exportar Audio WAV</button>
+        <span id="recStatus">Listo</span>
+    </div>
+
+    <script>
+        // DATOS DE LA ANIMACIÓN: Aquí debes pegar el JSON completo (Fuentes [1] a [2])
+        const animationData = {
+            "v":"5.9.0","fr":30,"ip":0,"op":105,"w":1920,"h":1080,"nm":"Ciudadano.news Logo Animation",
+            "layers": [
+                // Aquí van todas las capas: cnews_gold [1], cnews_white [3], n3 [4], etc.
+            ],
+            "markers": [ {"tm":0,"cm":"DOT_SPARK"}, {"tm":29,"cm":"COMPACT_IN"} ] // [2]
+        };
+
+        const canvas = document.getElementById('scene');
+        const recBtn = document.getElementById('recBtn');
+        const recStatus = document.getElementById('recStatus');
+        let anim;
+        let recordedChunks = [];
+
+        // Función para construir la escena usando el motor Lottie
+        function buildScene(c) {
+            if (anim) anim.destroy();
+            anim = lottie.loadAnimation({
+                container: null,
+                renderer: 'canvas',
+                loop: false,
+                autoplay: false,
+                animationData: animationData,
+                rendererSettings: { canvas: c, preserveAspectRatio: 'xMidYMid meet', clearCanvas: true }
+            });
+        }
+
+        function runSequence() { if (anim) anim.play(); }
+
+        // Función restart exacta de tus fuentes [9, 10]
+        function restart() { 
+            const rb = document.getElementById('replayBtn'); 
+            if (rb) rb.style.opacity = '0'; 
+            buildScene(canvas); 
+            void canvas.offsetWidth; 
+            runSequence(); 
+        }
+
+        // Lógica de grabación para WebM Alfa en Chrome [11-13]
+        recBtn.addEventListener('click', async () => {
+            recStatus.textContent = 'Preparando...'; [12, 13]
+            const stream = canvas.captureStream(30);
+            const mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm;codecs=vp9',
+                videoBitsPerSecond: 15000000
+            });
+
+            mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ciudadano_news.webm';
+                a.click();
+                recStatus.textContent = 'Listo';
+            };
+
+            mediaRecorder.start();
+            restart();
+            setTimeout(() => mediaRecorder.stop(), 4000); // Duración basada en op:105 [1]
+        });
+
+        // Lógica de audio WAV [12, 13]
+        document.getElementById('wavBtn').addEventListener('click', async () => {
+            const wavBtn = document.getElementById('wavBtn');
+            wavBtn.disabled = true;
+            wavBtn.textContent = '⏳ Renderizando...';
+            recStatus.textContent = 'Generando audio...';
+            // Aquí conectarías tu renderizador de audio offline
+        });
+
+        window.onload = () => buildScene(canvas);
+    </script>
+</body>
+</html>

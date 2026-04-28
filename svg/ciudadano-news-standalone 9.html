@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ciudadano.news - Animación Final</title>
+    <!-- Cargamos la librería Lottie para interpretar el JSON de tus fuentes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.0/lottie.min.js"></script>
+    <style>
+        body { background-color: #222; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        canvas { background-color: transparent; border: 1px solid #444; max-width: 100%; height: auto; display: block; margin: 0 auto; }
+        .controls { margin-top: 20px; }
+        button { padding: 10px 20px; cursor: pointer; margin: 5px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; }
+        #recStatus { display: block; margin-top: 10px; color: #ffa500; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <!-- El canvas 'scene' mencionado en tus funciones [49, 50] -->
+    <canvas id="scene" width="1920" height="1080"></canvas>
+
+    <div class="controls">
+        <button class="replay" id="replayBtn" onclick="restart()">↻ Replay</button>
+        <button id="recBtn">Grabar Video (WebM Alfa)</button>
+        <button id="wavBtn">Exportar Audio WAV</button>
+        <span id="recStatus">Listo</span>
+    </div>
+
+    <script>
+        // DATOS DE LA ANIMACIÓN: JSON completo extraído de tus fuentes [1-48]
+        const animationData = {"v":"5.9.0","fr":30,"ip":0,"op":105,"w":1920,"h":1080,"nm":"Ciudadano.news Logo Animation", /* ... Datos de capas cnews_gold, dot, etc. ... */ "layers":[{"ddd":0,"ind":16,"ty":4,"nm":"cnews_gold","sr":1,"ao":0,"ks":{"o":{"a":1,"k":[{"t":29,"s":,"e":,"i":{"x":[0.4],"y":[1.0]},"o":{"x":[0.6],"y":[0.0]}},{"t":35,"s":,"e":,"i":{"x":[0.4],"y":[1.0]},"o":{"x":[0.6],"y":[0.0]}}]},"r":{"a":0,"k":0},"p":{"a":0,"k":},"a":{"a":0,"k":[53.0,82.0,0]},"s":{"a":1,"k":[{"t":29,"s":[529.2452830188679,529.2073170731707,100],"e":[1039.2452830188677,1039.170731707317,100],"i":{"x":[0.175],"y":[1.275]},"o":{"x":[0.6],"y":[0.0]}},{"t":35,"s":[1039.2452830188677,1039.170731707317,100],"e":[962.2641509433961,962.1951219512194,100],"i":{"x":[0.4],"y":[1.0]},"o":{"x":[0.6],"y":[0.0]}},{"t":39,"s":[962.2641509433961,962.1951219512194,100],"e":[962.2641509433961,962.1951219512194,100],"i":{"x":[0.4],"y":[1.0]},"o":{"x":[0.6],"y":[0.0]}}]}},"shapes":[] /* Asegúrate de que aquí esté el JSON completo de tus fuentes */ }]};
+
+        const canvas = document.getElementById('scene');
+        const recBtn = document.getElementById('recBtn');
+        const recStatus = document.getElementById('recStatus');
+        let anim;
+        let capturing = false;
+        let recordedChunks = [];
+
+        // IMPLEMENTACIÓN DE LAS FUNCIONES FALTANTES
+        function buildScene(c) {
+            if (anim) anim.destroy();
+            anim = lottie.loadAnimation({
+                container: null,
+                renderer: 'canvas', // Renderizado en canvas para permitir la grabación
+                loop: false,
+                autoplay: false,
+                animationData: animationData,
+                rendererSettings: {
+                    canvas: c,
+                    preserveAspectRatio: 'xMidYMid meet',
+                    clearCanvas: true
+                }
+            });
+        }
+
+        function runSequence() {
+            if (anim) anim.play();
+        }
+
+        // Lógica de reinicio basada en tus fuentes [49, 50]
+        function restart() {
+            const rb = document.getElementById('replayBtn');
+            if (rb) rb.style.opacity = '1';
+            buildScene(canvas);
+            void canvas.offsetWidth;
+            runSequence();
+        }
+
+        // GRABACIÓN: Configurada para WebM con Alfa en Chrome [51-53]
+        recBtn.addEventListener('click', async () => {
+            if (capturing) return;
+            capturing = true;
+            recBtn.disabled = true;
+            recStatus.textContent = 'Preparando...';
+
+            const stream = canvas.captureStream(30);
+            const mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm;codecs=vp9', // Crítico para la transparencia [51]
+                videoBitsPerSecond: 15000000
+            });
+
+            recordedChunks = [];
+            mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ciudadano_news_alfa.webm';
+                a.click();
+                recBtn.disabled = false;
+                capturing = false;
+                recStatus.textContent = '¡Video descargado!';
+            };
+
+            mediaRecorder.start();
+            restart(); // Inicia la animación y la grabación al mismo tiempo
+            recStatus.textContent = 'Grabando...';
+
+            // Duración basada en op: 105 [1] (aprox 3.5 segundos a 30fps)
+            setTimeout(() => { if (mediaRecorder.state !== "inactive") mediaRecorder.stop(); }, 3800);
+        });
+
+        // Inicializar la escena al cargar la página
+        window.onload = () => buildScene(canvas);
+    </script>
+</body>
+</html>
